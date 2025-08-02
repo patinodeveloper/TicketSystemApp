@@ -7,16 +7,15 @@ import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { UserService } from '../../services/user.service';
-import { User, UserSelected } from '../../models/user.model';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { showConfirmDialog, showToastError, showToastInfo, showToastWarning } from '../../../../shared/utils/alerts';
-import { SaveUserModalComponent } from '../../modals/save-user-modal/save-user-modal.component';
-import { PermissionService } from '../../../../core/auth/services/permission.service';
+import { SaveCompanyModalComponent } from '../../modals/save-company-modal/save-company-modal.component';
 import { LoadingSpinnerComponent } from '../../../../shared/components/animations/loading-spinner/loading-spinner.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../../../core/auth/services/auth.service';
+import { CompanyService } from '../../services/company.service';
+import { Company, CompanySelected } from '../../models/company.model';
 
 @Component({
   selector: 'app-index',
@@ -31,8 +30,9 @@ import { AuthService } from '../../../../core/auth/services/auth.service';
     ConfirmDialogModule,
     IconFieldModule,
     InputIconModule,
-    SaveUserModalComponent,
+    SaveCompanyModalComponent,
     LoadingSpinnerComponent,
+    SaveCompanyModalComponent
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './index.component.html',
@@ -41,33 +41,32 @@ import { AuthService } from '../../../../core/auth/services/auth.service';
 export class IndexComponent {
   @ViewChild('dt') dt!: Table;
 
-  private readonly userService = inject(UserService);
+  private readonly companyService = inject(CompanyService);
   private readonly authService = inject(AuthService);
-  readonly permissionService = inject(PermissionService);
   private readonly destroyRef = inject(DestroyRef);
 
-  readonly users = this.userService.users;
+  readonly companies = this.companyService.companies;
 
   loading = false;
   globalFilter: string = '';
   showModal = false;
-  selectedUser: UserSelected | null = null;
+  selectedCompany: CompanySelected | null = null;
 
-  constructor(private messageService: MessageService, private confirmService: ConfirmationService) {}
+  constructor(private messageService: MessageService, private confirmService: ConfirmationService) { }
 
   ngOnInit(): void {
-    this.loadUsers();
+    this.loadCompanies();
   }
 
-  /** Carga los usuarios desde el servicio */
-  loadUsers() {
+  /** Carga las empresas desde el servicio */
+  loadCompanies() {
     this.loading = true;
-    this.userService
-      .getUsers()
+    this.companyService
+      .getCompanies()
       .pipe(takeUntilDestroyed(this.destroyRef)) // se destruye automaticamente
       .subscribe({
         error: (err) => {
-          showToastError(this.messageService, 'Error cargando usuarios');
+          showToastError(this.messageService, 'Error cargando empresas');
         },
         complete: () => {
           this.loading = false;
@@ -76,60 +75,63 @@ export class IndexComponent {
   }
 
   openCreateModal() {
-    this.selectedUser = null;
+    this.selectedCompany = null;
     this.showModal = true;
   }
 
-  editUser(user: User) {
+  editCompany(company: Company) {
     if (!this.authService.hasRole('ROLE_ADMIN')) {
       showToastWarning(this.messageService, 'No tienes privilegios para esta acción');
     } else {
-      this.selectedUser = {
-        id: user.id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        username: user.username,
-        email: user.email,
-        password: '',
-        roleIds: user.roles.map((role) => role.id),
+      this.selectedCompany = {
+        id: company.id,
+        name: company.name,
+        legalName: company.legalName,
+        rfc: company.rfc,
+        giro: company.giro,
+        address: company.address,
+        phone: company.phone,
+        secondPhone: company.secondPhone,
+        email: company.email,
+        active: company.active
       };
       this.showModal = true;
     }
   }
 
-  onUserSaved() {
-    this.loadUsers();
+  onCompanySaved() {
+    this.loadCompanies();
   }
 
-  confirmDelete(user: User) {
+  confirmDelete(company: Company) {
     if (!this.authService.hasRole('ROLE_ADMIN')) {
       showToastWarning(this.messageService, 'No tienes privilegios para esta acción');
     } else {
-      const msg = `¿Estás seguro de eliminar a <span class='text-red-400 font-bold'>${user.username}</span>?`;
-      showConfirmDialog(this.confirmService, msg, () => this.onDeleteUser(user));
+      const msg = `¿Estás seguro de eliminar a la <span class='text-red-400 font-bold'>${company.name}</span>?`;
+      showConfirmDialog(this.confirmService, msg, () => this.onDeleteCompany(company));
     }
   }
 
-  onDeleteUser(user: User) {
-    this.userService
-      .deleteUser(user.id)
+  onDeleteCompany(company: Company) {
+    this.companyService
+      .deleteCompany(company.id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
           if (res.status === 'success') {
-            showToastInfo(this.messageService, 'Usuario eliminado');
-            this.loadUsers();
+            showToastInfo(this.messageService, 'Empresa eliminada');
+            this.loadCompanies();
           } else {
             showToastError(this.messageService, res.message || 'Ocurrió un error');
           }
         },
         error: (err) => {
-          showToastError(this.messageService, 'Error al eliminar el usuario');
+          showToastError(this.messageService, 'Error al eliminar la empresa');
         },
       });
   }
 
-  // Busca en la tabla de usuarios
+  // Busca en la tabla de empresas
   onSearch(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input && this.dt) {

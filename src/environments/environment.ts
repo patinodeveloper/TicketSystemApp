@@ -2,5 +2,6 @@ export const environment = {
     production: false,
 
     // URL base del back
-    apiUrl: 'http://localhost:8080/api',
+    authApiUrl: 'http://localhost:8080/api',
+    ApiUrl: 'http://localhost:8080/ticketsystem/api',
 };

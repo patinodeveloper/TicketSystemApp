@@ -30,12 +30,38 @@ export class AppMenu {
         items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] }],
       },
       {
-        label: 'Módulos',
+        label: 'Gestión',
         items: [
-          { label: 'Usuarios', icon: 'pi pi-fw pi-users', routerLink: ['/users'] },
-          { label: 'Roles', icon: 'pi pi-fw pi-list-check', routerLink: ['/roles'] },
-          { label: 'Permisos', icon: 'pi pi-fw pi-key', routerLink: ['/permissions'] },
-          { label: 'Módulos', icon: 'pi pi-fw pi-box', routerLink: ['/modules'] },
+          {
+            label: 'Empresas',
+            icon: 'pi pi-fw pi-building',
+            routerLink: ['/companies'],
+          },
+          {
+            label: 'Proyectos',
+            icon: 'pi pi-fw pi-briefcase',
+            routerLink: ['/projects'],
+          },
+          {
+            label: 'Usuarios',
+            icon: 'pi pi-fw pi-users',
+            routerLink: ['/users'],
+          },
+        ],
+      },
+      {
+        label: 'Soporte',
+        items: [
+          {
+            label: 'Tickets',
+            icon: 'pi pi-fw pi-ticket',
+            routerLink: ['/tickets'],
+          },
+          {
+            label: 'Tipos de Soporte',
+            icon: 'pi pi-fw pi-wrench',
+            routerLink: ['/support-types'],
+          },
         ],
       },
       {

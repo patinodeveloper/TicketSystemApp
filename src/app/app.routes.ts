@@ -2,8 +2,7 @@ import { Routes } from '@angular/router';
 import { AppLayout } from './layout/component/app.layout';
 import { HomeComponent } from './core/pages/home/home.component';
 import { AUTH_ROUTES } from './core/auth/auth.routes';
-import { authGuard, permissionGuard } from './core/auth/guards/auth.guard';
-import { TestComponent } from './test/test.component';
+import { authGuard, roleGuard } from './core/auth/guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -18,23 +17,13 @@ export const routes: Routes = [
       {
         path: '',
         component: HomeComponent,
-        title: 'Dashboard - AuthApp',
+        title: 'Dashboard - TicketSystem',
       },
       {
-        path: 'test',
-        component: TestComponent,
-        canActivate: [permissionGuard(['users.index'])]
+        path: 'companies',
+        loadChildren: () => import('./features/companies/companies.routes').then(r => r.COMPANIES_ROUTES),
+        canActivate: [roleGuard(['ROLE_ADMIN', 'ROLE_CLIENT', 'ROLE_SUPPORT'])]
       },
-      {
-        path: 'users',
-        loadChildren: () => import('./features/users/users.routes').then(r => r.USERS_ROUTES),
-        canActivate: [permissionGuard(['users.index'])]
-      },
-      // {
-      //   path: 'roles',
-      //   loadChildren: () => import('./features/roles/roles.routes').then(r => r.ROLES_ROUTES),
-      //   canActivate: [permissionGuard(['roles.index'])]
-      // }
     ],
   },
   {

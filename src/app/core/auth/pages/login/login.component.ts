@@ -38,7 +38,7 @@ export class LoginComponent {
 
   // Signals para el estado del componente
   protected readonly formData = signal<LoginRequest>({
-    username: '',
+    email: '',
     password: '',
   });
 
@@ -60,8 +60,8 @@ export class LoginComponent {
     this.errorMessage.set(null);
 
     // Valida que los campos no estén vacíos
-    const { username, password } = this.formData();
-    if (!username.trim() || !password.trim()) {
+    const { email, password } = this.formData();
+    if (!email.trim() || !password.trim()) {
       this.errorMessage.set('Por favor, completa todos los campos');
       return;
     }
@@ -79,17 +79,17 @@ export class LoginComponent {
       error: (error) => {
         this.isLoading.set(false);
         this.errorMessage.set(
-          error?.error?.message || 'Credenciales incorrectas. Por favor, verifica tu usuario y contraseña.',
+          error?.error?.message || 'Credenciales incorrectas. Por favor, verifica tu correo y contraseña.',
         );
       },
     });
   }
 
   /**
-   * Actualiza el campo username
+   * Actualiza el campo email
    */
-  protected updateUsername(value: string): void {
-    this.formData.update((data) => ({ ...data, username: value }));
+  protected updateEmail(value: string): void {
+    this.formData.update((data) => ({ ...data, email: value }));
   }
 
   /**
@@ -122,7 +122,7 @@ export class LoginComponent {
    * Verifica si el formulario es válido
    */
   protected get isFormValid(): boolean {
-    const { username, password } = this.formData();
-    return username.trim().length > 0 && password.trim().length > 0;
+    const { email, password } = this.formData();
+    return email.trim().length > 0 && password.trim().length > 0;
   }
 }

@@ -16,7 +16,7 @@
                     <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">¡Bienvenido a
                         <span
                             class="font-extrabold text-transparent bg-gradient-to-br from-rose-500 via-pink-500 to-purple-600 bg-clip-text">
-                            AuthApp!
+                            TicketSystem!
                         </span>
                     </div>
                     <span class="text-muted-color font-medium">Inicia sesión para continuar</span>
@@ -30,14 +30,13 @@
                 <!-- Login Form -->
                 <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
                     <div>
-                        <!-- Username -->
-                        <label for="username"
-                            class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">
-                            Usuario
+                        <!-- Email -->
+                        <label for="email" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">
+                            Correo electrónico
                         </label>
-                        <input pInputText id="username" name="username" type="text" placeholder="Nombre de usuario"
-                            class="w-full md:w-[30rem] mb-8" [ngModel]="formData().username"
-                            (ngModelChange)="updateUsername($event)" required autocomplete="username"
+                        <input pInputText id="email" name="email" type="email" placeholder="ejemplo@correo.com"
+                            class="w-full md:w-[30rem] mb-8" [ngModel]="formData().email"
+                            (ngModelChange)="updateEmail($event)" required autocomplete="email"
                             [disabled]="isLoading()" />
 
                         <!-- Password -->

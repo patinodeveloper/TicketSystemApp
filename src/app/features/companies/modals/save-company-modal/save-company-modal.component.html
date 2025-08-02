@@ -1,0 +1,87 @@
+<p-dialog [(visible)]="visible" [modal]="true" [closable]="true"
+    [header]="selectedCompany ? 'Editar Empresa' : 'Crear Empresa'" [style]="{ width: '500px' }" (onHide)="onHide()">
+
+    <form class="flex flex-col gap-4" (ngSubmit)="saveCompany()" #form="ngForm">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block font-medium mb-1">
+                    Nombre Comercial
+                    <span class="text-red-500">*</span>
+                </label>
+                <input type="text" pInputText [(ngModel)]="companyForm.name" name="name" required class="w-full"
+                    placeholder="Nombre de la empresa" />
+            </div>
+
+            <div>
+                <label class="block font-medium mb-1">
+                    Razón Social
+                </label>
+                <input type="text" pInputText [(ngModel)]="companyForm.legalName" name="legalName" class="w-full"
+                    placeholder="Razón social legal" />
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block font-medium mb-1">
+                    RFC
+                </label>
+                <input type="text" pInputText [(ngModel)]="companyForm.rfc" name="rfc" class="w-full"
+                    placeholder="RFC de la empresa" />
+            </div>
+
+            <div>
+                <label class="block font-medium mb-1">
+                    Giro Comercial
+                    <span class="text-red-500">*</span>
+                </label>
+                <input type="text" pInputText [(ngModel)]="companyForm.giro" name="giro" required class="w-full"
+                    placeholder="Actividad comercial" />
+            </div>
+        </div>
+
+        <div>
+            <label class="block font-medium mb-1">
+                Dirección
+            </label>
+            <textarea pInputTextarea [(ngModel)]="companyForm.address" name="address" class="w-full" rows="2"
+                placeholder="Dirección completa de la empresa"></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block font-medium mb-1">
+                    Teléfono Principal
+                    <span class="text-red-500">*</span>
+                </label>
+                <input type="tel" pInputText [(ngModel)]="companyForm.phone" name="phone" required class="w-full"
+                    placeholder="Teléfono principal" />
+            </div>
+
+            <div>
+                <label class="block font-medium mb-1">
+                    Teléfono Secundario
+                </label>
+                <input type="tel" pInputText [(ngModel)]="companyForm.secondPhone" name="secondPhone" class="w-full"
+                    placeholder="Teléfono alternativo" />
+            </div>
+        </div>
+
+        <div>
+            <label class="block font-medium mb-1">
+                Correo Electrónico
+            </label>
+            <input type="email" pInputText [(ngModel)]="companyForm.email" name="email" class="w-full"
+                placeholder="correo@empresa.com" />
+        </div>
+
+        <div class="flex justify-end gap-2 mt-4">
+            <button pButton type="button" label="Cancelar" icon="pi pi-times"
+                class="p-button-sm p-button-secondary p-button-outlined" (click)="onHide()">
+            </button>
+            <button pButton type="submit" label="Guardar" icon="pi pi-check" class="p-button-sm p-button-success"
+                [disabled]="form.invalid">
+            </button>
+        </div>
+    </form>
+</p-dialog>

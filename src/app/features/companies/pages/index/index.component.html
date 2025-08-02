@@ -1,0 +1,77 @@
+<p-toast></p-toast>
+
+<!-- Modal -->
+<app-save-company-modal [(visible)]="showModal" [selectedCompany]="selectedCompany" (companySaved)="onCompanySaved()">
+</app-save-company-modal>
+
+<div class="card p-6">
+    <!-- Header -->
+    <div class="flex items-center mb-6 space-x-4">
+        <h1 class="text-3xl font-bold text-primary">Gestión de Empresas</h1>
+    </div>
+
+    <app-loading-spinner *ngIf="loading" items="empresas"></app-loading-spinner>
+
+    <!-- Tabla -->
+    <p-table [loading]="loading" *ngIf="!loading" #dt [value]="companies()" [paginator]="true" [rows]="5"
+        [rowHover]="true" [globalFilterFields]="['name', 'legalName', 'rfc', 'giro', 'email']"
+        responsiveLayout="scroll">
+
+        <ng-template #caption>
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <h5 class="m-0 text-center md:text-left">Listado de Empresas</h5>
+                <div
+                    class="flex flex-col items-center gap-2 w-full md:flex-row md:items-center md:w-auto md:justify-end">
+                    <button pButton type="button" label="Nueva Empresa" icon="pi pi-plus"
+                        (click)="openCreateModal()"></button>
+
+                    <p-iconfield class="w-full md:w-64">
+                        <p-inputicon>
+                            <i class="pi pi-search"></i>
+                        </p-inputicon>
+                        <input pInputText type="text" class="w-full" (input)="onSearch($event)"
+                            placeholder="Buscar empresas..." />
+                    </p-iconfield>
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th pSortableColumn="name">Nombre <p-sortIcon field="name" /></th>
+                <th pSortableColumn="legalName">Razón Social <p-sortIcon field="legalName" /></th>
+                <th pSortableColumn="rfc">RFC <p-sortIcon field="rfc" /></th>
+                <th pSortableColumn="giro">Giro <p-sortIcon field="giro" /></th>
+                <th pSortableColumn="phone">Teléfono <p-sortIcon field="phone" /></th>
+                <th pSortableColumn="email">Email <p-sortIcon field="email" /></th>
+                <th pSortableColumn="active">Estado <p-sortIcon field="active" /></th>
+                <th>Acciones</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-company>
+            <tr>
+                <td>{{ company.name }}</td>
+                <td>{{ company.legalName || '-' }}</td>
+                <td>{{ company.rfc || '-' }}</td>
+                <td>{{ company.giro }}</td>
+                <td>{{ company.phone }}</td>
+                <td>{{ company.email || '-' }}</td>
+                <td>
+                    <p-tag [value]="company.active ? 'Activa' : 'Inactiva'"
+                        [severity]="company.active ? 'success' : 'danger'"></p-tag>
+                </td>
+                <td class="flex space-x-2">
+                    <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-info p-button-sm"
+                        (click)="editCompany(company)" pTooltip="Editar"></button>
+                    <button pButton icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-sm"
+                        (click)="confirmDelete(company)" pTooltip="Eliminar"></button>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<p-confirmDialog acceptLabel="Sí, eliminar" rejectLabel="Cancelar"
+    rejectButtonStyleClass="p-button-text p-button-secondary" acceptButtonStyleClass="p-button-danger">
+</p-confirmDialog>

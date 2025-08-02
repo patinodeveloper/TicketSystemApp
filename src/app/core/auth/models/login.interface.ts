@@ -1,5 +1,5 @@
 export interface LoginRequest {
-  username: string;
+  email: string;
   password: string;
 }
 
@@ -27,7 +27,8 @@ export interface JwtPayload {
   username: string;
   firstName: string;
   lastName: string;
-  roles: string[];
+  secondLastName: string;
+  role: string;
   tokenType: string;
   sub: string;
   iat: number;

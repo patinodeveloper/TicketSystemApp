@@ -6,7 +6,6 @@ import { jwtDecode } from 'jwt-decode';
 import { JwtPayload, LoginRequest, LoginResponse, RefreshTokenRequest, RefreshTokenResponse } from '../models/login.interface';
 import { AuthState } from '../models/auth-state.interface';
 import { User } from '../models/user.interface';
-import { PermissionService } from './permission.service';
 import { environment } from '../../../../environments/environment';
 
 @Injectable({
@@ -15,9 +14,8 @@ import { environment } from '../../../../environments/environment';
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
-  private readonly permissionService = inject(PermissionService);
 
-  private readonly API_URL = environment.apiUrl;
+  private readonly API_URL = environment.authApiUrl;
   private readonly ACCESS_TOKEN_KEY = 'access_token';
   private readonly REFRESH_TOKEN_KEY = 'refresh_token';
   private readonly TOKEN_EXPIRES_KEY = 'token_expires_at';
@@ -91,13 +89,6 @@ export class AuthService {
       // Verifica si el token necesita renovarse
       this.scheduleTokenRefresh();
     }
-  }
-
-  public initializePermissions(): Observable<string[]> {
-    if (this.isAuthenticated) {
-      return this.permissionService.getUserPermissions();
-    }
-    return of([]);
   }
 
   /**
@@ -261,27 +252,12 @@ export class AuthService {
     this.router.navigate(['/auth/login']);
   }
 
-  // /**
-  //  * Verifica si el usuario tiene un permiso específico
-  //  * Usa el PermissionService en lugar de verificar en el token
-  //  */
-  // hasPermission(permission: string): boolean {
-  //   return this.permissionService.hasPermission(permission);
-  // }
-
   /**
    * Verifica si el usuario tiene un rol específico
    */
   hasRole(role: string): boolean {
-    return this.currentUser?.roles.includes(role) ?? false;
+    return this.currentUser?.role === role;
   }
-
-  // /**
-  //  * Verifica si el usuario tiene alguno de los permisos especificados
-  //  */
-  // hasAnyPermission(permissions: string[]): boolean {
-  //   return permissions.some((permission) => this.hasPermission(permission));
-  // }
 
   /**
    * Verifica si el usuario tiene alguno de los roles especificados
@@ -337,7 +313,8 @@ export class AuthService {
       username: decoded.username,
       firstName: decoded.firstName,
       lastName: decoded.lastName,
-      roles: decoded.roles || [],
+      secondLastName: decoded.secondLastName,
+      role: decoded.role,
     };
   }
 
