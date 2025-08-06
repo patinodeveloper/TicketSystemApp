@@ -9,5 +9,5 @@ import { ButtonModule } from 'primeng/button';
   styleUrl: './app.component.css',
 })
 export class AppComponent {
-  title = 'auth_app';
+  title = 'ticket_system';
 }

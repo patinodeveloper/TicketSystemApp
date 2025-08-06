@@ -12,6 +12,6 @@ export const AUTH_ROUTES: Routes = [
     path: 'login',
     component: LoginComponent,
     canActivate: [guestGuard],
-    title: 'Iniciar Sesión - AuthApp',
+    title: 'Iniciar Sesión - TicketSystem',
   },
 ];

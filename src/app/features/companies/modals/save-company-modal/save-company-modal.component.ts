@@ -30,8 +30,6 @@ export class SaveCompanyModalComponent {
   private readonly messageService = inject(MessageService);
   private readonly destroyRef = inject(DestroyRef);
 
-  showPassword = false;
-
   // Form template
   companyForm: CompanyRequest = {
     name: '',
@@ -76,10 +74,6 @@ export class SaveCompanyModalComponent {
         email: '',
       };
     }
-  }
-
-  togglePasswordView(): void {
-    this.showPassword = !this.showPassword;
   }
 
   onHide() {

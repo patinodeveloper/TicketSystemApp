@@ -22,7 +22,12 @@ export const routes: Routes = [
       {
         path: 'companies',
         loadChildren: () => import('./features/companies/companies.routes').then(r => r.COMPANIES_ROUTES),
-        canActivate: [roleGuard(['ROLE_ADMIN', 'ROLE_CLIENT', 'ROLE_SUPPORT'])]
+        canActivate: [roleGuard(['ROLE_ADMIN'])]
+      },
+      {
+        path: 'projects',
+        loadChildren: () => import('./features/projects/projects.routes').then(r => r.PROJECTS_ROUTES),
+        canActivate: [roleGuard(['ROLE_ADMIN'])]
       },
     ],
   },

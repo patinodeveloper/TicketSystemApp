@@ -1,0 +1,92 @@
+<p-dialog [(visible)]="visible" [modal]="true" [closable]="true"
+    [header]="selectedProject ? 'Editar Proyecto' : 'Crear Proyecto'" [style]="{ width: '600px' }" (onHide)="onHide()">
+
+    <form class="flex flex-col gap-4" (ngSubmit)="saveProject()" #form="ngForm">
+
+        <!-- Nombre del proyecto -->
+        <div>
+            <label class="block font-medium mb-2">
+                Nombre del Proyecto
+                <span class="text-red-500">*</span>
+            </label>
+            <input type="text" pInputText [(ngModel)]="projectForm.name" name="name" required class="w-full"
+                placeholder="Ingresa el nombre del proyecto" />
+        </div>
+
+        <!-- Select empresa -->
+        <div>
+            <label class="block font-medium mb-2">
+                Empresa
+                <span class="text-red-500">*</span>
+            </label>
+            <p-select [(ngModel)]="projectForm.companyId" name="companyId" [options]="companies" optionLabel="name"
+                optionValue="id" placeholder="Selecciona una empresa" [loading]="loadingCompanies" [filter]="true"
+                filterBy="name" [showClear]="true" class="w-full" appendTo="body" required>
+
+                <ng-template pTemplate="selectedItem" let-selectedCompany>
+                    <div class="flex align-items-center" *ngIf="selectedCompany">
+                        <span>{{ selectedCompany.name }}</span>
+                    </div>
+                </ng-template>
+
+                <ng-template pTemplate="item" let-company>
+                    <div class="flex items-center justify-between w-full">
+                        <div>
+                            <div class="font-medium">{{ company.name }}</div>
+                            <div class="text-sm text-600" *ngIf="company.giro">{{ company.giro }}</div>
+                        </div>
+
+                        <div class="ml-auto">
+                            <p-tag [value]="company.active ? 'Activa' : 'Inactiva'"
+                                [severity]="company.active ? 'success' : 'danger'" [style]="{ fontSize: '0.75rem' }">
+                            </p-tag>
+                        </div>
+                    </div>
+                </ng-template>
+
+                <ng-template pTemplate="empty">
+                    <div class="text-center p-3">
+                        <span *ngIf="loadingCompanies">Cargando empresas...</span>
+                        <span *ngIf="!loadingCompanies">No se encontraron empresas</span>
+                    </div>
+                </ng-template>
+            </p-select>
+        </div>
+
+        <!-- Descripción -->
+        <div>
+            <label class="block font-medium mb-2">
+                Descripción del proyecto
+            </label>
+            <textarea pTextarea [(ngModel)]="projectForm.description" name="description" class="w-full" rows="4">
+            </textarea>
+        </div>
+
+        <!-- Resumen si es edición -->
+        <div *ngIf="selectedProject" class="surface-100 p-3 border-round">
+            <div class="flex align-items-center gap-2 mb-2">
+                <i class="pi pi-info-circle text-blue-500"></i>
+                <span class="font-medium">Información actual</span>
+            </div>
+            <div class="text-sm text-600">
+                <div><strong>Empresa actual:</strong> {{ selectedProject.company.name }}</div>
+                <div><strong>Estado:</strong>
+                    <p-tag [value]="selectedProject.active ? 'Activo' : 'Inactivo'"
+                        [severity]="selectedProject.active ? 'success' : 'danger'"
+                        [style]="{ fontSize: '0.75rem', marginLeft: '0.5rem' }">
+                    </p-tag>
+                </div>
+            </div>
+        </div>
+
+        <!-- Btn de accion -->
+        <div class="flex justify-end gap-2 mt-4">
+            <button pButton type="button" label="Cancelar" icon="pi pi-times"
+                class="p-button-sm p-button-secondary p-button-outlined" (click)="onHide()">
+            </button>
+            <button pButton type="submit" label="Guardar" icon="pi pi-check" class="p-button-sm p-button-success"
+                [disabled]="!isFormValid || loadingCompanies">
+            </button>
+        </div>
+    </form>
+</p-dialog>

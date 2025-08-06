@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "auth_app": {
+    "ticket_system": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -38,7 +38,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/auth_app",
+            "outputPath": "dist/ticket_system",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -84,10 +84,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "auth_app:build:production"
+              "buildTarget": "ticket_system:build:production"
             },
             "development": {
-              "buildTarget": "auth_app:build:development"
+              "buildTarget": "ticket_system:build:development"
             }
           },
           "defaultConfiguration": "development"
