@@ -29,6 +29,11 @@ export const routes: Routes = [
         loadChildren: () => import('./features/projects/projects.routes').then(r => r.PROJECTS_ROUTES),
         canActivate: [roleGuard(['ROLE_ADMIN'])]
       },
+      {
+        path: 'support-types',
+        loadChildren: () => import('./features/support_types/support-types.routes').then(r => r.SUPPORT_TYPES_ROUTES),
+        canActivate: [roleGuard(['ROLE_ADMIN'])]
+      },
     ],
   },
   {

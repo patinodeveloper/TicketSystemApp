@@ -13,9 +13,9 @@ import { showConfirmDialog, showToastError, showToastInfo, showToastWarning } fr
 import { LoadingSpinnerComponent } from '../../../../shared/components/animations/loading-spinner/loading-spinner.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../../../core/auth/services/auth.service';
-import { SaveProjectModalComponent } from '../../modals/save-project-modal/save-project-modal.component';
-import { ProjectService } from '../../services/project.service';
-import { Project, ProjectSelected } from '../../models/project.model';
+import { SaveSupportTypeModalComponent } from '../../modals/save-support-type-modal/save-support-type-modal.component';
+import { SupportTypeService } from '../../services/support-type.service';
+import { SupportType, SupportTypeSelected } from '../../models/support-type.model';
 
 @Component({
   selector: 'app-index',
@@ -30,8 +30,8 @@ import { Project, ProjectSelected } from '../../models/project.model';
     ConfirmDialogModule,
     IconFieldModule,
     InputIconModule,
-    SaveProjectModalComponent,
     LoadingSpinnerComponent,
+    SaveSupportTypeModalComponent
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './index.component.html',
@@ -40,32 +40,32 @@ import { Project, ProjectSelected } from '../../models/project.model';
 export class IndexComponent {
   @ViewChild('dt') dt!: Table;
 
-  private readonly projectService = inject(ProjectService);
+  private readonly supportTypeService = inject(SupportTypeService);
   private readonly authService = inject(AuthService);
   private readonly destroyRef = inject(DestroyRef);
 
-  readonly projects = this.projectService.projects;
+  readonly supportTypes = this.supportTypeService.supportTypes;
 
   loading = false;
   globalFilter: string = '';
   showModal = false;
-  selectedProject: ProjectSelected | null = null;
+  selectedSupportType: SupportTypeSelected | null = null;
 
   constructor(private messageService: MessageService, private confirmService: ConfirmationService) { }
 
   ngOnInit(): void {
-    this.loadProjects();
+    this.loadSupportTypes();
   }
 
-  /** Carga los proyectos desde el servicio */
-  loadProjects() {
+  /** Carga los tipos de soporte desde el servicio */
+  loadSupportTypes() {
     this.loading = true;
-    this.projectService
-      .getProjects()
-      .pipe(takeUntilDestroyed(this.destroyRef)) // se destruye automaticamente
+    this.supportTypeService
+      .getSupportTypes()
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         error: (err) => {
-          showToastError(this.messageService, 'Error cargando proyectos');
+          showToastError(this.messageService, 'Error cargando tipos de soporte');
         },
         complete: () => {
           this.loading = false;
@@ -74,58 +74,57 @@ export class IndexComponent {
   }
 
   openCreateModal() {
-    this.selectedProject = null;
+    this.selectedSupportType = null;
     this.showModal = true;
   }
 
-  editProject(project: Project) {
+  editSupportType(SupportType: SupportType) {
     if (!this.authService.hasRole('ROLE_ADMIN')) {
       showToastWarning(this.messageService, 'No tienes privilegios para esta acción');
     } else {
-      this.selectedProject = {
-        id: project.id,
-        name: project.name,
-        description: project.description,
-        company: project.company,
-        active: project.active
+      this.selectedSupportType = {
+        id: SupportType.id,
+        name: SupportType.name,
+        description: SupportType.description,
+        active: SupportType.active
       };
       this.showModal = true;
     }
   }
 
-  onProjectSaved() {
-    this.loadProjects();
+  onSupportTypeSaved() {
+    this.loadSupportTypes();
   }
 
-  confirmDelete(project: Project) {
+  confirmDelete(supportType: SupportType) {
     if (!this.authService.hasRole('ROLE_ADMIN')) {
       showToastWarning(this.messageService, 'No tienes privilegios para esta acción');
     } else {
-      const msg = `¿Estás seguro de eliminar a la <span class='text-red-400 font-bold'>${project.name}</span>?`;
-      showConfirmDialog(this.confirmService, msg, () => this.onDeleteProject(project));
+      const msg = `¿Estás seguro de eliminar a la <span class='text-red-400 font-bold'>${supportType.name}</span>?`;
+      showConfirmDialog(this.confirmService, msg, () => this.onDeleteSupportType(supportType));
     }
   }
 
-  onDeleteProject(project: Project) {
-    this.projectService
-      .deleteProject(project.id)
+  onDeleteSupportType(supportType: SupportType) {
+    this.supportTypeService
+      .deleteSupportType(supportType.id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
           if (res.status === 'success') {
-            showToastInfo(this.messageService, 'Proyecto eliminado');
-            this.loadProjects();
+            showToastInfo(this.messageService, 'Soporte eliminado');
+            this.loadSupportTypes();
           } else {
             showToastError(this.messageService, res.message || 'Ocurrió un error');
           }
         },
         error: (err) => {
-          showToastError(this.messageService, 'Error al eliminar el proyecto');
+          showToastError(this.messageService, 'Error al eliminar el tipo de soporte');
         },
       });
   }
 
-  // Busca en la tabla de proyectos
+  // Busca en la tabla de tipos de soporte
   onSearch(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input && this.dt) {
