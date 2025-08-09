@@ -43,6 +43,8 @@ export class IndexComponent {
   private readonly supportTypeService = inject(SupportTypeService);
   private readonly authService = inject(AuthService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly messageService = inject(MessageService);
+  private readonly confirmService = inject(ConfirmationService);
 
   readonly supportTypes = this.supportTypeService.supportTypes;
 
@@ -51,7 +53,6 @@ export class IndexComponent {
   showModal = false;
   selectedSupportType: SupportTypeSelected | null = null;
 
-  constructor(private messageService: MessageService, private confirmService: ConfirmationService) { }
 
   ngOnInit(): void {
     this.loadSupportTypes();
@@ -100,7 +101,7 @@ export class IndexComponent {
     if (!this.authService.hasRole('ROLE_ADMIN')) {
       showToastWarning(this.messageService, 'No tienes privilegios para esta acción');
     } else {
-      const msg = `¿Estás seguro de eliminar a la <span class='text-red-400 font-bold'>${supportType.name}</span>?`;
+      const msg = `¿Estás seguro de eliminar el soporte <span class='text-red-400 font-bold'>${supportType.name}</span>?`;
       showConfirmDialog(this.confirmService, msg, () => this.onDeleteSupportType(supportType));
     }
   }

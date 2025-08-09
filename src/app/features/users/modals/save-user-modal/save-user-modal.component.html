@@ -1,0 +1,159 @@
+<p-dialog [(visible)]="visible" [modal]="true" [closable]="true"
+    [header]="selectedUser ? 'Editar Usuario' : 'Crear Usuario'" [style]="{ width: '600px' }" (onHide)="onHide()">
+
+    <form class="flex flex-col gap-4" (ngSubmit)="saveUser()" #form="ngForm">
+
+        <!-- Nombre -->
+        <div>
+            <label class="block font-medium mb-1">
+                Nombre
+                <span class="text-red-500">*</span>
+            </label>
+            <input type="text" pInputText [(ngModel)]="userForm.firstName" name="firstName" required class="w-full"
+                placeholder="Nombre" />
+        </div>
+
+        <!-- Apellidos -->
+        <div class="flex gap-4">
+            <div class="flex-1">
+                <label class="block font-medium mb-1">
+                    Apellido Paterno
+                </label>
+                <input type="text" pInputText [(ngModel)]="userForm.lastName" name="lastName" class="w-full"
+                    placeholder="Apellido paterno" />
+            </div>
+
+            <div class="flex-1">
+                <label class="block font-medium mb-1">
+                    Apellido Materno
+                </label>
+                <input type="text" pInputText [(ngModel)]="userForm.secondLastName" name="secondLastName" class="w-full"
+                    placeholder="Apellido materno" />
+            </div>
+        </div>
+
+        <!-- Accesos -->
+        <div class="flex gap-4">
+            <div class="flex-1">
+                <label class="block font-medium mb-1">
+                    Correo Electrónico
+                    <span class="text-red-500">*</span>
+                </label>
+                <input type="email" pInputText [(ngModel)]="userForm.email" name="email" required class="w-full"
+                    placeholder="correo@empresa.com" />
+            </div>
+
+            <div class="flex-1">
+                <label class="block font-medium mb-1">
+                    Rol
+                    <span class="text-red-500">*</span>
+                </label>
+                <p-select [(ngModel)]="userForm.role" name="role" [options]="roles" optionLabel="label"
+                    optionValue="value" placeholder="Selecciona un rol" appendTo="body" [showClear]="true" required
+                    class="w-full">
+                </p-select>
+            </div>
+        </div>
+
+        <!-- Empresa -->
+        <div>
+            <label class="block font-medium mb-2">
+                Empresa
+                <span class="text-red-500">*</span>
+            </label>
+            <p-select [(ngModel)]="userForm.companyId" name="companyId" [options]="companies" optionLabel="name"
+                optionValue="id" placeholder="Selecciona una empresa" [loading]="loadingCompanies" [filter]="true"
+                filterBy="name" [showClear]="true" class="w-full" appendTo="body" required>
+
+                <ng-template pTemplate="selectedItem" let-selectedCompany>
+                    <div class="flex align-items-center" *ngIf="selectedCompany">
+                        <span>{{ selectedCompany.name }}</span>
+                    </div>
+                </ng-template>
+
+                <ng-template pTemplate="item" let-company>
+                    <div class="flex items-center justify-between w-full">
+                        <div>
+                            <div class="font-medium">{{ company.name }}</div>
+                            <div class="text-sm text-600" *ngIf="company.giro">{{ company.giro }}</div>
+                        </div>
+
+                        <div class="ml-auto">
+                            <p-tag [value]="company.active ? 'Activa' : 'Inactiva'"
+                                [severity]="company.active ? 'success' : 'danger'" [style]="{ fontSize: '0.75rem' }">
+                            </p-tag>
+                        </div>
+                    </div>
+                </ng-template>
+
+                <ng-template pTemplate="empty">
+                    <div class="text-center p-3">
+                        <span *ngIf="loadingCompanies">Cargando empresas...</span>
+                        <span *ngIf="!loadingCompanies">No se encontraron empresas</span>
+                    </div>
+                </ng-template>
+            </p-select>
+        </div>
+
+        <!-- Contraseña -->
+        <div>
+            <label class="block font-medium mb-1">
+                Contraseña
+                <span *ngIf="!selectedUser" class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+                <input [type]="showPassword ? 'text' : 'password'" pInputText [(ngModel)]="userForm.password"
+                    name="password" class="w-full pr-10"
+                    placeholder="{{ selectedUser ? 'Dejar vacío para mantener la contraseña actual' : 'Ingrese contraseña' }}"
+                    [required]="!selectedUser" />
+                <button type="button"
+                    class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                    (click)="togglePasswordVisibility()">
+                    <i [class]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
+                </button>
+            </div>
+            <small *ngIf="selectedUser" class="text-gray-500">
+                Dejar vacío para mantener la contraseña actual
+            </small>
+            <div *ngIf="!selectedUser || (selectedUser && userForm.password)" class="mt-2">
+                <small class="text-gray-600 block">
+                    La contraseña debe cumplir con los siguientes requisitos:
+                </small>
+                <ul class="text-xs text-gray-500 mt-1 ml-4 list-disc">
+                    <li>Mínimo 6 caracteres</li>
+                    <li>Al menos una letra mayúscula</li>
+                    <li>Al menos una letra minúscula</li>
+                    <li>Al menos un número</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Información actual si es edición -->
+        <div *ngIf="selectedUser" class="surface-100 p-3 border-round">
+            <div class="flex align-items-center gap-2 mb-2">
+                <i class="pi pi-info-circle text-blue-500"></i>
+                <span class="font-medium">Información actual</span>
+            </div>
+            <div class="text-sm text-600">
+                <div><strong>Empresa actual:</strong> {{ selectedUser.company.name }}</div>
+                <div><strong>Estado:</strong>
+                    <p-tag [value]="selectedUser.active ? 'Activo' : 'Inactivo'"
+                        [severity]="selectedUser.active ? 'success' : 'danger'"
+                        [style]="{ fontSize: '0.75rem', marginLeft: '0.5rem' }">
+                    </p-tag>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="flex justify-end gap-2 mt-4">
+            <button pButton type="button" label="Cancelar" icon="pi pi-times"
+                class="p-button-sm p-button-secondary p-button-outlined" (click)="onHide()">
+            </button>
+            <button pButton type="submit" label="Guardar" icon="pi pi-check" class="p-button-sm p-button-success"
+                [disabled]="form.invalid || loadingCompanies">
+            </button>
+        </div>
+
+    </form>
+</p-dialog>

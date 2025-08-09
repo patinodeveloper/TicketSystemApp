@@ -10,12 +10,12 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { showConfirmDialog, showToastError, showToastInfo, showToastWarning } from '../../../../shared/utils/alerts';
-import { SaveCompanyModalComponent } from '../../modals/save-company-modal/save-company-modal.component';
 import { LoadingSpinnerComponent } from '../../../../shared/components/animations/loading-spinner/loading-spinner.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../../../core/auth/services/auth.service';
-import { CompanyService } from '../../services/company.service';
-import { Company, CompanySelected } from '../../models/company.model';
+import { SaveUserModalComponent } from '../../modals/save-user-modal/save-user-modal.component';
+import { UserService } from '../../services/user.service';
+import { User, UserSelected } from '../../models/user.model';
 
 @Component({
   selector: 'app-index',
@@ -30,9 +30,8 @@ import { Company, CompanySelected } from '../../models/company.model';
     ConfirmDialogModule,
     IconFieldModule,
     InputIconModule,
-    SaveCompanyModalComponent,
     LoadingSpinnerComponent,
-    SaveCompanyModalComponent
+    SaveUserModalComponent
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './index.component.html',
@@ -41,32 +40,32 @@ import { Company, CompanySelected } from '../../models/company.model';
 export class IndexComponent {
   @ViewChild('dt') dt!: Table;
 
-  private readonly companyService = inject(CompanyService);
+  private readonly userService = inject(UserService);
   private readonly authService = inject(AuthService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly messageService = inject(MessageService);
   private readonly confirmService = inject(ConfirmationService);
 
-  readonly companies = this.companyService.companies;
+  readonly users = this.userService.users;
 
   loading = false;
   globalFilter: string = '';
   showModal = false;
-  selectedCompany: CompanySelected | null = null;
+  selectedUser: UserSelected | null = null;
 
   ngOnInit(): void {
-    this.loadCompanies();
+    this.loadUsers();
   }
 
-  /** Carga las empresas desde el servicio */
-  loadCompanies() {
+  /** Carga los usuarios desde el servicio */
+  private loadUsers() {
     this.loading = true;
-    this.companyService
-      .getCompanies()
-      .pipe(takeUntilDestroyed(this.destroyRef)) // se destruye automaticamente
+    this.userService
+      .getUsers()
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         error: (err) => {
-          showToastError(this.messageService, 'Error cargando empresas');
+          showToastError(this.messageService, 'Error cargando usuarios');
         },
         complete: () => {
           this.loading = false;
@@ -75,63 +74,89 @@ export class IndexComponent {
   }
 
   openCreateModal() {
-    this.selectedCompany = null;
+    this.selectedUser = null;
     this.showModal = true;
   }
 
-  editCompany(company: Company) {
+  editUser(user: User) {
     if (!this.authService.hasRole('ROLE_ADMIN')) {
       showToastWarning(this.messageService, 'No tienes privilegios para esta acción');
     } else {
-      this.selectedCompany = {
-        id: company.id,
-        name: company.name,
-        legalName: company.legalName,
-        rfc: company.rfc,
-        giro: company.giro,
-        address: company.address,
-        phone: company.phone,
-        secondPhone: company.secondPhone,
-        email: company.email,
-        active: company.active
+      this.selectedUser = {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        secondLastName: user.secondLastName,
+        email: user.email,
+        role: user.role,
+        company: user.company,
+        active: user.active
       };
       this.showModal = true;
     }
   }
 
-  onCompanySaved() {
-    this.loadCompanies();
+  onUserSaved() {
+    this.loadUsers();
   }
 
-  confirmDelete(company: Company) {
+  confirmDelete(user: User) {
     if (!this.authService.hasRole('ROLE_ADMIN')) {
       showToastWarning(this.messageService, 'No tienes privilegios para esta acción');
     } else {
-      const msg = `¿Estás seguro de eliminar a la empresa <span class='text-red-400 font-bold'>${company.name}</span>?`;
-      showConfirmDialog(this.confirmService, msg, () => this.onDeleteCompany(company));
+      const msg = `¿Estás seguro de eliminar al usuario <span class='text-red-400 font-bold'>${user.firstName} ${user.lastName}</span>?`;
+      showConfirmDialog(this.confirmService, msg, () => this.onDeleteUser(user));
     }
   }
 
-  onDeleteCompany(company: Company) {
-    this.companyService
-      .deleteCompany(company.id)
+  onDeleteUser(user: User) {
+    this.userService
+      .deleteUser(user.id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
           if (res.status === 'success') {
-            showToastInfo(this.messageService, 'Empresa eliminada');
-            this.loadCompanies();
+            showToastInfo(this.messageService, 'Usuario eliminado');
+            this.loadUsers();
           } else {
             showToastError(this.messageService, res.message || 'Ocurrió un error');
           }
         },
         error: (err) => {
-          showToastError(this.messageService, 'Error al eliminar la empresa');
+          showToastError(this.messageService, 'Error al eliminar el Usuario');
         },
       });
   }
 
-  // Busca en la tabla de empresas
+  /** Aplica un color a la p-tag segun el rol */
+  getSeverityByRole(role: string): 'danger' | 'info' | 'success' | 'secondary' {
+    switch (role) {
+      case 'ADMIN':
+        return 'danger'
+      case 'SUPPORT':
+        return 'info'
+      case 'CLIENT':
+        return 'success'
+      default:
+        return 'secondary';
+    }
+  }
+
+  /** Traduce el ROLE_NAME a una manera mas intuitiva */
+  getRole(role: string) {
+    switch (role) {
+      case 'ADMIN':
+        return 'Administrador'
+      case 'SUPPORT':
+        return 'Soporte'
+      case 'CLIENT':
+        return 'Cliente'
+      default:
+        return role;
+    }
+  }
+
+  // Busca en la tabla de usuarios
   onSearch(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input && this.dt) {

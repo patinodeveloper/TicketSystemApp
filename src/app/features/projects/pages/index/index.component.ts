@@ -43,6 +43,8 @@ export class IndexComponent {
   private readonly projectService = inject(ProjectService);
   private readonly authService = inject(AuthService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly messageService = inject(MessageService);
+  private readonly confirmService = inject(ConfirmationService);
 
   readonly projects = this.projectService.projects;
 
@@ -51,7 +53,6 @@ export class IndexComponent {
   showModal = false;
   selectedProject: ProjectSelected | null = null;
 
-  constructor(private messageService: MessageService, private confirmService: ConfirmationService) { }
 
   ngOnInit(): void {
     this.loadProjects();
@@ -101,7 +102,7 @@ export class IndexComponent {
     if (!this.authService.hasRole('ROLE_ADMIN')) {
       showToastWarning(this.messageService, 'No tienes privilegios para esta acción');
     } else {
-      const msg = `¿Estás seguro de eliminar a la <span class='text-red-400 font-bold'>${project.name}</span>?`;
+      const msg = `¿Estás seguro de eliminar el proyecto <span class='text-red-400 font-bold'>${project.name}</span>?`;
       showConfirmDialog(this.confirmService, msg, () => this.onDeleteProject(project));
     }
   }

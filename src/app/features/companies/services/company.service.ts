@@ -28,7 +28,7 @@ export class CompanyService {
         this.companies.set(response.data);
       }),
       catchError((error) => {
-        console.error('Error obteniendo los empresas', error);
+        console.error('Error obteniendo las empresas', error);
         this.error.set(error || 'Error obteniendo las empresas activas');
         return throwError(() => error);
       }),

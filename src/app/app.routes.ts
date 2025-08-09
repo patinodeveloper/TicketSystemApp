@@ -34,6 +34,11 @@ export const routes: Routes = [
         loadChildren: () => import('./features/support_types/support-types.routes').then(r => r.SUPPORT_TYPES_ROUTES),
         canActivate: [roleGuard(['ROLE_ADMIN'])]
       },
+      {
+        path: 'users',
+        loadChildren: () => import('./features/users/users.routes').then(r => r.USERS_ROUTES),
+        canActivate: [roleGuard(['ROLE_ADMIN'])]
+      },
     ],
   },
   {

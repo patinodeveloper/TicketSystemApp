@@ -1,0 +1,79 @@
+<p-toast></p-toast>
+
+<!-- Modal -->
+<app-save-user-modal [(visible)]="showModal" [selectedUser]="selectedUser" (userSaved)="onUserSaved()">
+</app-save-user-modal>
+
+<div class="card p-6">
+    <!-- Header -->
+    <div class="flex items-center mb-6 space-x-4">
+        <h1 class="text-3xl font-bold text-primary">Gestión de Usuarios</h1>
+    </div>
+
+    <app-loading-spinner *ngIf="loading" items="usuarios"></app-loading-spinner>
+
+    <!-- Tabla -->
+    <p-table [loading]="loading" *ngIf="!loading" #dt [value]="users()" [paginator]="true" [rows]="5" [rowHover]="true"
+        [globalFilterFields]="['firstName', 'lastName', 'secondLastName', 'email', 'company.name']"
+        responsiveLayout="scroll">
+
+        <ng-template #caption>
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <h5 class="m-0 text-center md:text-left">Listado de Usuarios</h5>
+                <div
+                    class="flex flex-col items-center gap-2 w-full md:flex-row md:items-center md:w-auto md:justify-end">
+                    <button pButton type="button" label="Nuevo Usuario" icon="pi pi-plus"
+                        (click)="openCreateModal()"></button>
+
+                    <p-iconfield class="w-full md:w-64">
+                        <p-inputicon>
+                            <i class="pi pi-search"></i>
+                        </p-inputicon>
+                        <input pInputText type="text" class="w-full" (input)="onSearch($event)"
+                            placeholder="Buscar usuarios..." />
+                    </p-iconfield>
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th pSortableColumn="firstName">Nombre <p-sortIcon field="firstName" /></th>
+                <th pSortableColumn="lastName">Apellido Paterno <p-sortIcon field="lastName" /></th>
+                <th pSortableColumn="secondLastName">Apellido Materno <p-sortIcon field="secondLastName" /></th>
+                <th pSortableColumn="email">Email <p-sortIcon field="email" /></th>
+                <th pSortableColumn="role">Rol <p-sortIcon field="role" /></th>
+                <th pSortableColumn="company">Empresa <p-sortIcon field="company" /></th>
+                <th pSortableColumn="active">Estado <p-sortIcon field="active" /></th>
+                <th>Acciones</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-user>
+            <tr>
+                <td>{{ user.firstName }}</td>
+                <td>{{ user.lastName || '-' }}</td>
+                <td>{{ user.secondLastName || '-' }}</td>
+                <td>{{ user.email || '-' }}</td>
+                <td>
+                    <p-tag [value]=getRole(user.role) [severity]=getSeverityByRole(user.role)></p-tag>
+                </td>
+                <td>{{ user.company.name }}</td>
+                <td>
+                    <p-tag [value]="user.active ? 'Activo' : 'Inactivo'"
+                        [severity]="user.active ? 'success' : 'danger'"></p-tag>
+                </td>
+                <td class="flex space-x-2">
+                    <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-info p-button-sm"
+                        (click)="editUser(user)" pTooltip="Editar"></button>
+                    <button pButton icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-sm"
+                        (click)="confirmDelete(user)" pTooltip="Eliminar"></button>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<p-confirmDialog acceptLabel="Sí, eliminar" rejectLabel="Cancelar"
+    rejectButtonStyleClass="p-button-text p-button-secondary" acceptButtonStyleClass="p-button-danger">
+</p-confirmDialog>
